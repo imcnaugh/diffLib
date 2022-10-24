@@ -1,3 +1,8 @@
+const START_DIFF_TAG = '['
+const END_DIFF_TAG = ']'
+const EXPECTED_ACTUAL_SEPARATOR = '|'
+
+
 function Diff(expected, actual) {
     this.expected = expected
     this.actual = actual
@@ -6,8 +11,8 @@ function Diff(expected, actual) {
 
 Diff.prototype.gitDiff = function() {
     if(this.isEqual) return this.actual
+
     let minLenght = Math.min(this.expected.length, this.actual.length)
-    
     let diffStartIndex = 0
     for(let i = 0; i < minLenght; i++) {    
         if(this.expected[i] !== this.actual[i]) {
@@ -28,13 +33,17 @@ Diff.prototype.gitDiff = function() {
         actualIndex--
     }
 
-    let expectedDiff = this.expected.substring(diffStartIndex, expectedIndex)
-    let acutalDiff = this.actual.substring(diffStartIndex, actualIndex)
-
-    let ret = this.expected.substring(0, diffStartIndex) + '[' + expectedDiff + '|' + acutalDiff + ']' + this.expected.substring(expectedIndex)
-
-    return ret
-
+    const commonPrefix = this.expected.substring(0, diffStartIndex)
+    const expectedDiff = this.expected.substring(diffStartIndex, expectedIndex)
+    const acutalDiff = this.actual.substring(diffStartIndex, actualIndex)
+    const commonPostfix = this.expected.substring(expectedIndex)
+    return commonPrefix + 
+        START_DIFF_TAG + 
+        expectedDiff + 
+        EXPECTED_ACTUAL_SEPARATOR + 
+        acutalDiff + 
+        END_DIFF_TAG + 
+        commonPostfix
 }
 
 module.exports = Diff
