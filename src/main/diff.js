@@ -8,8 +8,7 @@ const ENCODED_EXPECTED_ACTUAL_SEPARATOR = '||'
 function Diff(expected, actual) {
     this.expected = encodeString(expected)
     this.actual = encodeString(actual)
-    this.isEqual = expected === actual
-    this.diffString = this.getDiffString()
+    this.diffString = getDiffString(this.expected, this.actual)
 }
 
 function encodeString(str) {
@@ -18,22 +17,14 @@ function encodeString(str) {
         .replace(EXPECTED_ACTUAL_SEPARATOR , ENCODED_EXPECTED_ACTUAL_SEPARATOR)
 }
 
-Diff.prototype.getDiffString = function() {
-    if(this.isEqual) return this.expected
+function getDiffString(expected, actual) {
+    if(expected === actual) return actual
 
-    let minLenght = Math.min(this.expected.length, this.actual.length)
-    let diffStartIndex = 0
-    for(let i = 0; i < minLenght; i++) {    
-        if(this.expected[i] !== this.actual[i]) {
-            diffStartIndex = i;
-            break;
-        }
-    }
-
-    let expectedIndex = this.expected.length - 1
-    let actualIndex = this.actual.length - 1
+    let diffStartIndex = findDiffStartIndex(expected, actual)
+    let expectedIndex = expected.length - 1
+    let actualIndex = actual.length - 1
     for(;;) {
-        if(this.expected[expectedIndex] !== this.actual[actualIndex]) {
+        if(expected[expectedIndex] !== actual[actualIndex]) {
             expectedIndex++
             actualIndex++
             break;
@@ -42,10 +33,10 @@ Diff.prototype.getDiffString = function() {
         actualIndex--
     }
 
-    const commonPrefix = this.expected.substring(0, diffStartIndex)
-    const expectedDiff = this.expected.substring(diffStartIndex, expectedIndex)
-    const acutalDiff = this.actual.substring(diffStartIndex, actualIndex)
-    const commonPostfix = this.expected.substring(expectedIndex)
+    const commonPrefix = expected.substring(0, diffStartIndex)
+    const expectedDiff = expected.substring(diffStartIndex, expectedIndex)
+    const acutalDiff = actual.substring(diffStartIndex, actualIndex)
+    const commonPostfix = expected.substring(expectedIndex)
     return commonPrefix + 
         START_DIFF_TAG + 
         expectedDiff + 
@@ -56,3 +47,15 @@ Diff.prototype.getDiffString = function() {
 }
 
 module.exports = Diff
+
+function findDiffStartIndex(expected, actual) {
+    let minLenght = Math.min(expected.length, actual.length)
+    let diffStartIndex = 0
+    for (let i = 0; i < minLenght; i++) {
+        if (expected[i] !== actual[i]) {
+            diffStartIndex = i
+            break
+        }
+    }
+    return diffStartIndex
+}
