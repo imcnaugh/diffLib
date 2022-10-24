@@ -9,6 +9,7 @@ function Diff(expected, actual) {
     this.expected = encodeString(expected)
     this.actual = encodeString(actual)
     this.isEqual = expected === actual
+    this.diffString = this.gitDiff()
 }
 
 function encodeString(str) {
