@@ -1,5 +1,15 @@
 const Diff = require('../main/diff.js')
 
+test('should return true when s1 is equal to s2', () => {
+    const diff = new Diff('1', '1')
+    expect(diff.isEqual).toBe(true)
+})
+
+test('should return false when s1 is not equal to s2', () => {
+    const diff = new Diff('1', '2')
+    expect(diff.isEqual).toBe(false)
+})
+
 test('diff should remember expected and acutal', () => {
     const diff = new Diff('1', '2')
     expect(diff.expected).toBe('1')
@@ -44,4 +54,34 @@ test('special chars should be encoded correctly', () => {
 test('diff strings with special chars should be encoded and diffed correctly', () => {
     const diff = new Diff('[]|', '[abc]|')
     expect(diff.diffString).toBe('[[[|abc]]]||')
+})
+
+test('should show diff of longer strings', () => {
+    const diff = new Diff('this is a longer string it has a few words', 'this s a longer string it has a fe words')
+    expect(diff.diffString).toBe('this [is a longer string it has a few|s a longer string it has a fe] words')
+})
+
+test('a difference of case should show up as a diff', () => {
+    const diff = new Diff('A', 'a')
+    expect(diff.diffString).toBe('[A|a]')
+})
+
+test('ints should be diffed propertly', () => {
+    const diff = new Diff(1, 2)
+    expect(diff.diffString).toBe('[1|2]')
+})
+
+test('two of the same ints should diff properly', () => {
+    const diff = new Diff(0, 0)
+    expect(diff.diffString).toBe('0')
+})
+
+test('what happens when an int and a string are diffed', () => {
+    const diff = new Diff(1, '1')
+    expect(diff.diffString).toBe('1')
+})
+
+test('what happens when large ints and a string are diffed', () => {
+    const diff = new Diff(1001, '1001')
+    expect(diff.diffString).toBe('1001')
 })
