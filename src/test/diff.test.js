@@ -45,3 +45,13 @@ test('empty actual should be handled appropriately', () => {
     const diff = new Diff('abc', '')
     expect(diff.gitDiff()).toBe('[abc|]')
 })
+
+test('special chars should be encoded correctly', () => {
+    const diff = new Diff('[]|', '[]|')
+    expect(diff.gitDiff()).toBe('[[]]||')
+})
+
+test('diff strings with special chars should be encoded and diffed correctly', () => {
+    const diff = new Diff('[]|', '[abc]|')
+    expect(diff.gitDiff()).toBe('[[[|abc]]]||')
+})

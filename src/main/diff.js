@@ -1,12 +1,20 @@
 const START_DIFF_TAG = '['
 const END_DIFF_TAG = ']'
 const EXPECTED_ACTUAL_SEPARATOR = '|'
-
+const ENCODED_START_DIFF_TAG = '[['
+const ENCODED_END_DIFF_TAG = ']]'
+const ENCODED_EXPECTED_ACTUAL_SEPARATOR = '||'
 
 function Diff(expected, actual) {
-    this.expected = expected
-    this.actual = actual
+    this.expected = encodeString(expected)
+    this.actual = encodeString(actual)
     this.isEqual = expected === actual
+}
+
+function encodeString(str) {
+    return str.replace(START_DIFF_TAG , ENCODED_START_DIFF_TAG)
+        .replace(END_DIFF_TAG , ENCODED_END_DIFF_TAG)
+        .replace(EXPECTED_ACTUAL_SEPARATOR , ENCODED_EXPECTED_ACTUAL_SEPARATOR)
 }
 
 Diff.prototype.gitDiff = function() {
