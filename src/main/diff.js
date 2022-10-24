@@ -9,7 +9,7 @@ function Diff(expected, actual) {
     this.expected = encodeString(expected)
     this.actual = encodeString(actual)
     this.isEqual = expected === actual
-    this.diffString = this.gitDiff()
+    this.diffString = this.getDiffString()
 }
 
 function encodeString(str) {
@@ -18,8 +18,8 @@ function encodeString(str) {
         .replace(EXPECTED_ACTUAL_SEPARATOR , ENCODED_EXPECTED_ACTUAL_SEPARATOR)
 }
 
-Diff.prototype.gitDiff = function() {
-    if(this.isEqual) return this.actual
+Diff.prototype.getDiffString = function() {
+    if(this.isEqual) return this.expected
 
     let minLenght = Math.min(this.expected.length, this.actual.length)
     let diffStartIndex = 0
