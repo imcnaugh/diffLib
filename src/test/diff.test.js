@@ -63,6 +63,13 @@ describe('Verify diff by letter', () => {
         const diff = new Diff('A', 'a')
         expect(diff.diffByLetter()).toBe('[A|a]')
     })
+
+    test('diff a longer string with multile diffs', () => {
+        const s1 = 'aabbbcccdddeee'
+        const s2 = 'aaabbbcccdddee'
+        const diff = new Diff(s1, s2)
+        expect(diff.diffByLetter()).toBe('aa[bbbcccddde|abbbcccddd]ee')
+    })
 })
 
 describe('Verify diff by word', () =>{
@@ -116,5 +123,22 @@ describe('Verify some edge cases are handled', () => {
     test('what happens when large ints and a string are diffed', () => {
         const diff = new Diff(1001, '1001')
         expect(diff.diffByLetter()).toBe('1001')
+    })
+})
+
+describe('Ideal behaivor', () => {
+    
+    test('diff a longer string with multile diffs', () => {
+        const s1 = 'aabbbcccdddeee'
+        const s2 = 'aaabbbcccdddee'
+        const diff = new Diff(s1, s2)
+        expect(diff.diffByManyLetters()).toBe('aa[|a]bbbccc[e|]ee')
+    })
+
+    test('idk', () => {
+        const s1 = 'bbbcccddde'
+        const s2 = 'bbbcccddd'
+        const diff = new Diff(s1, s2)
+        expect(diff.diffByLetter()).toBe('bbbcccddd[e|]')
     })
 })
