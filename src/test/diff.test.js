@@ -66,11 +66,25 @@ describe('Verify diff by letter', () => {
 })
 
 describe('Verify diff by word', () =>{
-    test('verify that diffing by words works correcctly', () =>{
+    test('Last word in string has diff', () =>{
         const s1 = 'words but some are misspelled';
         const s2 = 'words but some are misselled';
         const diff = new Diff(s1, s2)
         expect(diff.diffByWord()).toBe('words but some are [misspelled|misselled]')
+    })
+
+    test('First word in string has diff', () => {
+        const s1 = 'words but some are misspelled';
+        const s2 = 'word but some are misspelled';
+        const diff = new Diff(s1, s2)
+        expect(diff.diffByWord()).toBe('[words|word] but some are misspelled')
+    })
+
+    test('Middle word in string has diff', () => {
+        const s1 = 'words but soe are misspelled';
+        const s2 = 'words but some are misspelled';
+        const diff = new Diff(s1, s2)
+        expect(diff.diffByWord()).toBe('words but [soe|some] are misspelled')
     })
 })
 
