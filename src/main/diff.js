@@ -17,28 +17,6 @@ Diff.prototype.diffByLetter = function() {
     return createDiffString(this.expected.split(sepereator), this.actual.split(sepereator), sepereator)
 }
 
-Diff.prototype.diffByManyLetters = function() {
-    const sepereator = ''
-    if(this.isEqual) return this.actual
-    const diffString = createDiffString(this.expected.split(sepereator), this.actual.split(sepereator), sepereator)
-
-    const diffRegex = new RegExp('\\[(.*)\\|(.*)\\]')
-    const parts = diffString.match(diffRegex)
-    const expectedDiff = parts[1] //bbbcccddde
-    const actualDiff = parts[2] //abbbcccddd
-    let i = 0;
-    for(; i < actualDiff.length; i++) {
-        if(actualDiff[i] === expectedDiff[0]) {
-            break
-        }
-    }
-
-    const newActualDiff = actualDiff.slice(i)
-    const newDiff = createDiffString(expectedDiff.split(sepereator), newActualDiff.split(sepereator), sepereator)
-
-    return 'aa[|a]bbbccc[e|]ee'
-}
-
 Diff.prototype.diffByWord = function() {
     const sepereator = ' '
     if(this.isEqual) return this.actual

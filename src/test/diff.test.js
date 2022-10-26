@@ -132,13 +132,6 @@ describe('Ideal behaivor', () => {
         const s1 = 'aabbbcccdddeee'
         const s2 = 'aaabbbcccdddee'
         const diff = new Diff(s1, s2)
-        expect(diff.diffByManyLetters()).toBe('aa[|a]bbbccc[e|]ee')
-    })
-
-    test('idk', () => {
-        const s1 = 'bbbcccddde'
-        const s2 = 'bbbcccddd'
-        const diff = new Diff(s1, s2)
-        expect(diff.diffByLetter()).toBe('bbbcccddd[e|]')
+        expect(diff.diffByLetter()).toBe('aa[|a]bbbccc[e|]ee')
     })
 })
