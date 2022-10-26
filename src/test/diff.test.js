@@ -63,13 +63,6 @@ describe('Verify diff by letter', () => {
         const diff = new Diff('A', 'a')
         expect(diff.diffByLetter()).toBe('[A|a]')
     })
-
-    test('diff a longer string with multile diffs', () => {
-        const s1 = 'aabbbcccdddeee'
-        const s2 = 'aaabbbcccdddee'
-        const diff = new Diff(s1, s2)
-        expect(diff.diffByLetter()).toBe('aa[bbbcccddde|abbbcccddd]ee')
-    })
 })
 
 describe('Verify diff by word', () =>{
@@ -132,6 +125,6 @@ describe('Ideal behaivor', () => {
         const s1 = 'aabbbcccdddeee'
         const s2 = 'aaabbbcccdddee'
         const diff = new Diff(s1, s2)
-        expect(diff.diffByLetter()).toBe('aa[|a]bbbccc[e|]ee')
+        expect(diff.diffByLetter()).toBe('aa[|a]bbbcccdddee[e|]')
     })
 })

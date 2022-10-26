@@ -30,20 +30,60 @@ Diff.prototype.diffByLine = function() {
 }
 
 function createDiffString(expected, actual, sepereator) {
-    let prefixCommonCount = findPrefixCommonCharCount(expected, actual)
-    let postfixCommonCount = findPostfixCommonCharsCount(expected, actual)
+    if(expected.length === 0 && actual.length === 0) return ''
+    if(expected.length === 0) {
+        return START_DIFF_TAG + EXPECTED_ACTUAL_SEPARATOR +  actual.join(sepereator) + END_DIFF_TAG
+    }
+    if(actual.length === 0){
+        return START_DIFF_TAG + expected.join(sepereator) + EXPECTED_ACTUAL_SEPARATOR + END_DIFF_TAG
+    } 
 
-    const commonPrefix = expected.slice(0, prefixCommonCount).join(sepereator)
-    const expectedDiff = expected.slice(prefixCommonCount, expected.length - postfixCommonCount).join(sepereator)
-    const acutalDiff = actual.slice(prefixCommonCount, actual.length - postfixCommonCount).join(sepereator)
-    const commonPostfix = expected.slice(expected.length - postfixCommonCount).join(sepereator)
-    return commonPrefix + (commonPrefix.length > 0 ? sepereator : '') +
-        START_DIFF_TAG +
-        expectedDiff +
-        EXPECTED_ACTUAL_SEPARATOR +
-        acutalDiff +
-        END_DIFF_TAG + (commonPostfix.length > 0 ? sepereator: '') +
-        commonPostfix
+    let prefixCommonCount = findPrefixCommonCharCount(expected, actual)
+    if(prefixCommonCount === expected.length && prefixCommonCount == actual.length) {
+        return actual.join(sepereator)
+    }
+    let commonPrefix = actual.slice(0, prefixCommonCount).join(sepereator)
+    if(commonPrefix.length > 0) commonPrefix += sepereator
+
+    let expectedRemainingPostDiffIndex = prefixCommonCount
+    let actualRemainingPostDiffIndex = prefixCommonCount
+
+    let maxOfStringLength = Math.max(expected.length, actual.length)
+    let itemsInExpectedDiff = []
+    let itemsInActualDiff = []
+
+    for (let i = prefixCommonCount; i <= maxOfStringLength; i++) {
+        expectedRemainingPostDiffIndex = i
+        actualRemainingPostDiffIndex = i
+        let b = false
+        if(expected.length > i){
+            itemsInExpectedDiff.push(expected[i])
+        }
+        if(actual.length > i){
+            itemsInActualDiff.push(actual[i])
+        }
+        if(expected.length > 1 && itemsInActualDiff.includes(expected[i])){
+            actualRemainingPostDiffIndex = actual.slice(prefixCommonCount).indexOf(expected[i]) + prefixCommonCount
+            b = true
+        }
+        if(actual.length > 1 && itemsInExpectedDiff.includes(actual[i])){
+            expectedRemainingPostDiffIndex = expected.slice(prefixCommonCount).indexOf(actual[i]) + prefixCommonCount
+            b = true
+        }
+        if(b) break
+    }
+
+    let diff = START_DIFF_TAG + 
+        expected.slice(prefixCommonCount, expectedRemainingPostDiffIndex).join(sepereator) + 
+        EXPECTED_ACTUAL_SEPARATOR + 
+        actual.slice(prefixCommonCount, actualRemainingPostDiffIndex).join(sepereator) + 
+        END_DIFF_TAG
+
+    let remainingExpected = expected.slice(expectedRemainingPostDiffIndex)
+    let remainingActual = actual.slice(actualRemainingPostDiffIndex)
+    let postFix = createDiffString(remainingExpected, remainingActual, sepereator)
+    if(postFix.length > 0) postFix = sepereator + postFix
+    return commonPrefix + diff + postFix
 }
 
 function encodeString(str) {
@@ -61,19 +101,6 @@ function findPrefixCommonCharCount(expected, actual) {
         }
     }
     return i
-}
-
-function findPostfixCommonCharsCount(expected, actual) {
-    let postfixCommonChars = 0
-    let expectedIndex = expected.length - 1
-    let actualIndex = actual.length - 1
-    while ((expected.length > postfixCommonChars || actual.length > postfixCommonChars) && 
-        (expected[expectedIndex] === actual[actualIndex])) {
-        postfixCommonChars++
-        expectedIndex--
-        actualIndex--
-    }
-    return postfixCommonChars
 }
 
 module.exports = Diff
