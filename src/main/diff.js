@@ -73,17 +73,21 @@ function createDiffString(expected, actual, sepereator) {
         if(b) break
     }
 
-    let diff = START_DIFF_TAG + 
-        expected.slice(prefixCommonCount, expectedRemainingPostDiffIndex).join(sepereator) + 
-        EXPECTED_ACTUAL_SEPARATOR + 
-        actual.slice(prefixCommonCount, actualRemainingPostDiffIndex).join(sepereator) + 
-        END_DIFF_TAG
+    let diff = generateDiffString(expected.slice(prefixCommonCount, expectedRemainingPostDiffIndex), actual.slice(prefixCommonCount, actualRemainingPostDiffIndex), sepereator)
 
     let remainingExpected = expected.slice(expectedRemainingPostDiffIndex)
     let remainingActual = actual.slice(actualRemainingPostDiffIndex)
     let postFix = createDiffString(remainingExpected, remainingActual, sepereator)
     if(postFix.length > 0) postFix = sepereator + postFix
     return commonPrefix + diff + postFix
+}
+
+function generateDiffString(expected, actual, sepereator) {
+    return START_DIFF_TAG +
+        expected.join(sepereator) +
+        EXPECTED_ACTUAL_SEPARATOR +
+        actual.join(sepereator) +
+        END_DIFF_TAG
 }
 
 function encodeString(str) {
