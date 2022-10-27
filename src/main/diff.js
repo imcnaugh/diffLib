@@ -32,10 +32,10 @@ Diff.prototype.diffByLine = function() {
 function createDiffString(expected, actual, sepereator) {
     if(expected.length === 0 && actual.length === 0) return ''
     if(expected.length === 0) {
-        return START_DIFF_TAG + EXPECTED_ACTUAL_SEPARATOR +  actual.join(sepereator) + END_DIFF_TAG
+        return generateDiffString([], actual, sepereator)
     }
     if(actual.length === 0){
-        return START_DIFF_TAG + expected.join(sepereator) + EXPECTED_ACTUAL_SEPARATOR + END_DIFF_TAG
+        return generateDiffString(expected, [], sepereator)
     } 
 
     let prefixCommonCount = findPrefixCommonCharCount(expected, actual)
@@ -82,7 +82,7 @@ function createDiffString(expected, actual, sepereator) {
     return commonPrefix + diff + postFix
 }
 
-function generateDiffString(expected, actual, sepereator) {
+function generateDiffString(expected = [], actual = [], sepereator) {
     return START_DIFF_TAG +
         expected.join(sepereator) +
         EXPECTED_ACTUAL_SEPARATOR +
