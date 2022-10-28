@@ -5,10 +5,16 @@ const ENCODED_START_DIFF_TAG = START_DIFF_TAG + START_DIFF_TAG
 const ENCODED_END_DIFF_TAG = END_DIFF_TAG + END_DIFF_TAG
 const ENCODED_EXPECTED_ACTUAL_SEPARATOR = EXPECTED_ACTUAL_SEPARATOR + EXPECTED_ACTUAL_SEPARATOR
 
-function Diff(expected, actual) {
+function Diff(expected, actual, sepereator) {
     this.expected = encodeString(expected)
     this.actual = encodeString(actual)
     this.isEqual = this.expected === this.actual
+    this.sepereator = sepereator
+}
+
+Diff.prototype.getDiffString = function() {
+    if(this.isEqual) return this.actual
+    return createDiffString(this.expected.split(this.sepereator), this.actual.split(this.sepereator), this.sepereator)
 }
 
 Diff.prototype.diffByLetter = function() {
