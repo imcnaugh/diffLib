@@ -16,13 +16,11 @@ Diff.prototype.getDiffString = function() {
     this.diffParts = []
     this.remainingExpected = this.expected.split(this.delimiter)
     this.remainingActual = this.actual.split(this.delimiter)
-
-    if(this.isEqual) return this.actual
     return createDiffString.call(this)
 }
 
 function createDiffString() {
-    if(this.remainingExpected.length === 0 && this.remainingActual.length === 0) return
+    if(this.remainingExpected.length === 0 && this.remainingActual.length === 0) return ''
     addNextPrefix.call(this)
     addNextDiff.call(this)
     createDiffString.call(this)
