@@ -30,29 +30,22 @@ Diff.prototype.diffByLine = function() {
 }
 
 function createDiffString(expected, actual, sepereator) {
-    if(expected.length === 0 && actual.length === 0) return ''
-    if(expected.length === 0) {
-        return generateDiffString([], actual, sepereator)
-    }
-    if(actual.length === 0){
-        return generateDiffString(expected, [], sepereator)
-    } 
-
-    let prefixCommonCount = findPrefixCommonCharCount(expected, actual)
-    if(prefixCommonCount === expected.length && prefixCommonCount == actual.length) {
+    let commonPrefix = findCommonPrefix(expected, actual)
+    if(commonPrefix.length === expected.length && commonPrefix.length === actual.length) {
         return actual.join(sepereator)
     }
-    let commonPrefix = actual.slice(0, prefixCommonCount).join(sepereator)
-    if(commonPrefix.length > 0) commonPrefix += sepereator
 
-    let expectedRemainingPostDiffIndex = prefixCommonCount
-    let actualRemainingPostDiffIndex = prefixCommonCount
+    actual = actual.slice(commonPrefix.length)
+    expected = expected.slice(commonPrefix.length)
+
+    let expectedRemainingPostDiffIndex = 0
+    let actualRemainingPostDiffIndex = 0
 
     let maxOfStringLength = Math.max(expected.length, actual.length)
     let itemsInExpectedDiff = []
     let itemsInActualDiff = []
 
-    for (let i = prefixCommonCount; i <= maxOfStringLength; i++) {
+    for (let i = 0; i <= maxOfStringLength; i++) {
         expectedRemainingPostDiffIndex = i
         actualRemainingPostDiffIndex = i
         let b = false
@@ -63,26 +56,30 @@ function createDiffString(expected, actual, sepereator) {
             itemsInActualDiff.push(actual[i])
         }
         if(expected.length > 1 && itemsInActualDiff.includes(expected[i])){
-            actualRemainingPostDiffIndex = actual.slice(prefixCommonCount).indexOf(expected[i]) + prefixCommonCount
+            actualRemainingPostDiffIndex = actual.indexOf(expected[i])
             b = true
         }
         if(actual.length > 1 && itemsInExpectedDiff.includes(actual[i])){
-            expectedRemainingPostDiffIndex = expected.slice(prefixCommonCount).indexOf(actual[i]) + prefixCommonCount
+            expectedRemainingPostDiffIndex = expected.indexOf(actual[i])
             b = true
         }
         if(b) break
     }
 
-    let diff = generateDiffString(expected.slice(prefixCommonCount, expectedRemainingPostDiffIndex), actual.slice(prefixCommonCount, actualRemainingPostDiffIndex), sepereator)
+    let diff = generateDiffString(expected.slice(0, expectedRemainingPostDiffIndex), actual.slice(0, actualRemainingPostDiffIndex), sepereator)
 
     let remainingExpected = expected.slice(expectedRemainingPostDiffIndex)
     let remainingActual = actual.slice(actualRemainingPostDiffIndex)
-    let postFix = createDiffString(remainingExpected, remainingActual, sepereator)
-    if(postFix.length > 0) postFix = sepereator + postFix
-    return commonPrefix + diff + postFix
+
+    commonPrefix.push(diff)
+    if(remainingActual.length > 0 && remainingExpected.length > 0) {
+        let postFix = createDiffString(remainingExpected, remainingActual, sepereator)
+        commonPrefix.push(postFix)
+    }
+    return commonPrefix.join(sepereator)
 }
 
-function generateDiffString(expected = [], actual = [], sepereator) {
+function generateDiffString(expected, actual, sepereator) {
     return START_DIFF_TAG +
         expected.join(sepereator) +
         EXPECTED_ACTUAL_SEPARATOR +
@@ -91,20 +88,21 @@ function generateDiffString(expected = [], actual = [], sepereator) {
 }
 
 function encodeString(str) {
-    return str.toString().replace(START_DIFF_TAG , ENCODED_START_DIFF_TAG)
+    return str.toString()
+        .replace(START_DIFF_TAG , ENCODED_START_DIFF_TAG)
         .replace(END_DIFF_TAG , ENCODED_END_DIFF_TAG)
         .replace(EXPECTED_ACTUAL_SEPARATOR , ENCODED_EXPECTED_ACTUAL_SEPARATOR)
 }
 
-function findPrefixCommonCharCount(expected, actual) {
+function findCommonPrefix(expected, actual) {
     let minLenght = Math.min(expected.length, actual.length)
     let i = 0
     for (; i < minLenght; i++) {
         if (expected[i] !== actual[i]) {
-            break
+            return expected.slice(0, i)
         }
     }
-    return i
+    return actual.slice(0, i)
 }
 
 module.exports = Diff

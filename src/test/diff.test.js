@@ -19,6 +19,11 @@ describe('Verify diff paramaters', () => {
 })
 
 describe('Verify diff by letter', () => {
+    test('two equal strings should not have a diff', () => {
+        const diff = new Diff('1', '1')
+        expect(diff.diffByLetter()).toBe('1')
+    })
+
     test('should show the diff of a single world', () => {
         const diff = new Diff('abc', 'adc')
         expect(diff.diffByLetter()).toBe('a[b|d]c')
