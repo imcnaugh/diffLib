@@ -19,7 +19,7 @@ describe('Verify diff paramaters', () => {
 
     test('diff should remember the delimiter', () => {
         const diff = new Diff('1', '2', 'x')
-        expect(diff.sepereator).toBe('x')
+        expect(diff.delimiter).toBe('x')
     })
 })
 
