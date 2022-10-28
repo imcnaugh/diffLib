@@ -31,6 +31,7 @@ Diff.prototype.diffByLine = function() {
 
 function createDiffString(expected, actual, sepereator) {
     let commonPrefix = findCommonPrefix(expected, actual)
+
     if(commonPrefix.length === expected.length && commonPrefix.length === actual.length) {
         return actual.join(sepereator)
     }
@@ -38,34 +39,7 @@ function createDiffString(expected, actual, sepereator) {
     actual = actual.slice(commonPrefix.length)
     expected = expected.slice(commonPrefix.length)
 
-    let expectedRemainingPostDiffIndex = 0
-    let actualRemainingPostDiffIndex = 0
-
-    let maxOfStringLength = Math.max(expected.length, actual.length)
-    let itemsInExpectedDiff = []
-    let itemsInActualDiff = []
-
-    for (let i = 0; i <= maxOfStringLength; i++) {
-        expectedRemainingPostDiffIndex = i
-        actualRemainingPostDiffIndex = i
-        let b = false
-        if(expected.length > i){
-            itemsInExpectedDiff.push(expected[i])
-        }
-        if(actual.length > i){
-            itemsInActualDiff.push(actual[i])
-        }
-        if(expected.length > 1 && itemsInActualDiff.includes(expected[i])){
-            actualRemainingPostDiffIndex = actual.indexOf(expected[i])
-            b = true
-        }
-        if(actual.length > 1 && itemsInExpectedDiff.includes(actual[i])){
-            expectedRemainingPostDiffIndex = expected.indexOf(actual[i])
-            b = true
-        }
-        if(b) break
-    }
-
+    let { expectedRemainingPostDiffIndex, actualRemainingPostDiffIndex } = findIndexsForNextCommonElement(expected, actual)
     let diff = generateDiffString(expected.slice(0, expectedRemainingPostDiffIndex), actual.slice(0, actualRemainingPostDiffIndex), sepereator)
 
     let remainingExpected = expected.slice(expectedRemainingPostDiffIndex)
@@ -77,6 +51,36 @@ function createDiffString(expected, actual, sepereator) {
         commonPrefix.push(postFix)
     }
     return commonPrefix.join(sepereator)
+}
+
+function findIndexsForNextCommonElement(expected, actual) {
+    let expectedRemainingPostDiffIndex = 0
+    let actualRemainingPostDiffIndex = 0
+    let itemsInExpectedDiff = []
+    let itemsInActualDiff = []
+    let maxOfStringLength = Math.max(expected.length, actual.length)
+    for (let i = 0; i <= maxOfStringLength; i++) {
+        expectedRemainingPostDiffIndex = i
+        actualRemainingPostDiffIndex = i
+        let b = false
+        if (expected.length > i) {
+            itemsInExpectedDiff.push(expected[i])
+        }
+        if (actual.length > i) {
+            itemsInActualDiff.push(actual[i])
+        }
+        if (expected.length > 1 && itemsInActualDiff.includes(expected[i])) {
+            actualRemainingPostDiffIndex = actual.indexOf(expected[i])
+            b = true
+        }
+        if (actual.length > 1 && itemsInExpectedDiff.includes(actual[i])) {
+            expectedRemainingPostDiffIndex = expected.indexOf(actual[i])
+            b = true
+        }
+        if (b)
+            break
+    }
+    return { expectedRemainingPostDiffIndex, actualRemainingPostDiffIndex }
 }
 
 function generateDiffString(expected, actual, sepereator) {
