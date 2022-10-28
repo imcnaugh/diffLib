@@ -13,8 +13,8 @@ describe('Verify diff paramaters', () => {
     
     test('diff should remember expected and acutal', () => {
         const diff = new Diff('1', '2')
-        expect(diff.expected).toBe('1')
-        expect(diff.actual).toBe('2')
+        expect(diff.encodedExpected).toBe('1')
+        expect(diff.encodedActual).toBe('2')
     })
 
     test('diff should remember the delimiter', () => {

@@ -7,15 +7,17 @@ const ENCODED_EXPECTED_ACTUAL_SEPARATOR = EXPECTED_ACTUAL_SEPARATOR + EXPECTED_A
 
 function Diff(expected, actual, delimiter) {
     this.isEqual = expected === actual
-    this.expected = this.encodeString(expected)
-    this.actual = this.encodeString(actual)
+    this.originalExpected = expected
+    this.originalActual = actual
+    this.encodedExpected = this.encodeString(expected)
+    this.encodedActual = this.encodeString(actual)
     this.delimiter = delimiter
 }
 
 Diff.prototype.getDiffString = function() {
     this.diffParts = []
-    this.remainingExpected = this.expected.split(this.delimiter)
-    this.remainingActual = this.actual.split(this.delimiter)
+    this.remainingExpected = this.encodedExpected.split(this.delimiter)
+    this.remainingActual = this.encodedActual.split(this.delimiter)
     return this.createDiffString()
 }
 
@@ -24,7 +26,7 @@ Diff.prototype.createDiffString = function() {
     this.addNextPrefix()
     this.addNextDiff()
     this.createDiffString()
-    return this.diffParts.join(this.delimiter)
+    return this.diffParts.filter(Boolean).join(this.delimiter)
 }
 
 Diff.prototype.addNextPrefix = function() {
@@ -36,11 +38,8 @@ Diff.prototype.addNextPrefix = function() {
         }
     }
 
-    if(i > 0) {
-        this.diffParts.push(this.remainingActual.slice(0,i).join(this.delimiter))
-    }
-    this.remainingExpected = this.remainingExpected.slice(i)
-    this.remainingActual = this.remainingActual.slice(i)
+    this.diffParts.push(this.remainingActual.slice(0,i).join(this.delimiter))
+    this.sliceRemaining(i, i)
 }
 
 Diff.prototype.addNextDiff = function() {
@@ -75,14 +74,17 @@ Diff.prototype.addNextDiff = function() {
     const diffOfActual = this.remainingActual.slice(0, actualRemainingPostDiffIndex)
 
     const diffPart = this.generateDiffString(diffOfExpected, diffOfActual)
-    if(diffPart.length > 3) {
-        this.diffParts.push(diffPart)
-    }
-    this.remainingExpected = this.remainingExpected.slice(expectedRemainingPostDiffIndex)
-    this.remainingActual = this.remainingActual.slice(actualRemainingPostDiffIndex)
+    this.diffParts.push(diffPart)
+    this.sliceRemaining(expectedRemainingPostDiffIndex, actualRemainingPostDiffIndex)
+}
+
+Diff.prototype.sliceRemaining = function(remainingSliceIndex, actualSliceIndex) {
+    this.remainingExpected = this.remainingExpected.slice(remainingSliceIndex)
+    this.remainingActual = this.remainingActual.slice(actualSliceIndex)
 }
 
 Diff.prototype.generateDiffString = function(expected, actual) {
+    if(expected.length === 0 && actual.length === 0) return ''
     return START_DIFF_TAG +
         expected.join(this.delimiter) +
         EXPECTED_ACTUAL_SEPARATOR +
