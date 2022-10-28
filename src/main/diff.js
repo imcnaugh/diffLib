@@ -18,15 +18,15 @@ Diff.prototype.getDiffString = function() {
     this.diffParts = []
     this.remainingExpected = this.encodedExpected.split(this.delimiter)
     this.remainingActual = this.encodedActual.split(this.delimiter)
-    return this.createDiffString()
+    this.createDiffString()
+    return this.diffParts.filter(Boolean).join(this.delimiter)
 }
 
 Diff.prototype.createDiffString = function() {
-    if(this.remainingExpected.length === 0 && this.remainingActual.length === 0) return ''
+    if(this.remainingExpected.length === 0 && this.remainingActual.length === 0) return
     this.addNextPrefix()
     this.addNextDiff()
     this.createDiffString()
-    return this.diffParts.filter(Boolean).join(this.delimiter)
 }
 
 Diff.prototype.addNextPrefix = function() {
@@ -47,8 +47,8 @@ Diff.prototype.addNextDiff = function() {
 
     const diffOfExpected = this.remainingExpected.slice(0, expectedRemainingPostDiffIndex)
     const diffOfActual = this.remainingActual.slice(0, actualRemainingPostDiffIndex)
-
     const diffPart = this.generateDiffString(diffOfExpected, diffOfActual)
+
     this.diffParts.push(diffPart)
     this.sliceRemaining(expectedRemainingPostDiffIndex, actualRemainingPostDiffIndex)
 }
@@ -72,7 +72,7 @@ Diff.prototype.findIndexesForNextDiff = function() {
         if (this.remainingActual.length > i && !itemsInActualDiff[remainingActualCharAti]) {
             itemsInActualDiff[remainingActualCharAti] = i
         }
-        
+
         let b = false
         if (itemsInActualDiff[remainingExpectedCharAti] !== undefined) {
             actualRemainingPostDiffIndex = this.remainingActual.indexOf(remainingExpectedCharAti)
