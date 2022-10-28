@@ -59,7 +59,7 @@ function addNextDiff() {
     const diffOfActual = this.remainingActual.slice(0, actualRemainingPostDiffIndex)
 
     const diffPart = generateDiffString.call(this, diffOfExpected, diffOfActual)
-    if(diffPart.length > 0) {
+    if(diffPart.length > 3) {
         this.diffParts.push(diffPart)
     }
     this.remainingExpected = this.remainingExpected.slice(expectedRemainingPostDiffIndex)
@@ -67,7 +67,6 @@ function addNextDiff() {
 }
 
 function generateDiffString(expected, actual) {
-    if(expected.length === 0 && actual.length === 0) return ''
     return START_DIFF_TAG +
         expected.join(this.delimiter) +
         EXPECTED_ACTUAL_SEPARATOR +
