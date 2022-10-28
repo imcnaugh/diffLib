@@ -17,12 +17,6 @@ Diff.prototype.getDiffString = function() {
     return createDiffString(this.expected.split(this.delimiter), this.actual.split(this.delimiter), this.delimiter)
 }
 
-Diff.prototype.diffByLine = function() {
-    const sepereator = '\n'
-    if(this.isEqual) return this.actual
-    return createDiffString(this.expected.split(sepereator), this.actual.split(sepereator), sepereator)
-}
-
 function createDiffString(expected, actual, delimiter) {
     let commonPrefix = findCommonPrefix(expected, actual)
 

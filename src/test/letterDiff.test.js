@@ -50,4 +50,11 @@ describe('Verify diff by letter', () => {
         const diff = new LetterDiff('A', 'a')
         expect(diff.getDiffString()).toBe('[A|a]')
     })
+
+    test('diff a longer string with multile diffs', () => {
+        const s1 = 'aabbbcccdddeee'
+        const s2 = 'aaabbbcccdddee'
+        const diff = new LetterDiff(s1, s2, '')
+        expect(diff.getDiffString()).toBe('aa[|a]bbbcccdddee[e|]')
+    })
 })
