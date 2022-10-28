@@ -13,61 +13,59 @@ function Diff(expected, actual, delimiter) {
 }
 
 Diff.prototype.getDiffString = function() {
+    this.diffParts = []
+    this.remainingExpected = this.expected.split(this.delimiter)
+    this.remainingActual = this.actual.split(this.delimiter)
+
     if(this.isEqual) return this.actual
-    return createDiffString.call(this, this.expected.split(this.delimiter), this.actual.split(this.delimiter))
+    return createDiffString.call(this)
 }
 
-function createDiffString(expected, actual) {
-    const commonPrefix = findCommonPrefix.call(this, expected, actual)
-
-    expected = expected.slice(commonPrefix.length)
-    actual = actual.slice(commonPrefix.length)
-
-    let { expectedRemainingPostDiffIndex, actualRemainingPostDiffIndex } = findIndexsForNextCommonElement.call(this, expected, actual)
-    const diffOfExpected = expected.slice(0, expectedRemainingPostDiffIndex)
-    const diffOfActual = actual.slice(0, actualRemainingPostDiffIndex)
-    
-    const diffString = generateDiffString.call(this, diffOfExpected, diffOfActual)
-    if(diffString.length !== 0) commonPrefix.push(diffString)
-
-    expected = expected.slice(expectedRemainingPostDiffIndex)
-    actual = actual.slice(actualRemainingPostDiffIndex)
-    
-    if(actual.length > 0 && expected.length > 0) {
-        let postFix = createDiffString.call(this, expected, actual)
-        commonPrefix.push(postFix)
-    }
-    return commonPrefix.join(this.delimiter)
+function createDiffString() {
+    if(this.remainingExpected.length === 0 && this.remainingActual.length === 0) return
+    addNextPrefix.call(this)
+    addNextDiff.call(this)
+    createDiffString.call(this)
+    return this.diffParts.join(this.delimiter)
 }
 
-function findIndexsForNextCommonElement(expected, actual) {
+function addNextDiff() {
     let expectedRemainingPostDiffIndex = 0
     let actualRemainingPostDiffIndex = 0
     let itemsInExpectedDiff = []
     let itemsInActualDiff = []
-    let maxOfStringLength = Math.max(expected.length, actual.length)
+    let maxOfStringLength = Math.max(this.remainingExpected.length, this.remainingActual.length)
     for (let i = 0; i <= maxOfStringLength; i++) {
         expectedRemainingPostDiffIndex = i
         actualRemainingPostDiffIndex = i
         let b = false
-        if (expected.length > i) {
-            itemsInExpectedDiff.push(expected[i])
+        if (this.remainingExpected.length > i) {
+            itemsInExpectedDiff.push(this.remainingExpected[i])
         }
-        if (actual.length > i) {
-            itemsInActualDiff.push(actual[i])
+        if (this.remainingActual.length > i) {
+            itemsInActualDiff.push(this.remainingActual[i])
         }
-        if (expected.length > 1 && itemsInActualDiff.includes(expected[i])) {
-            actualRemainingPostDiffIndex = actual.indexOf(expected[i])
+        if (this.remainingExpected.length > 1 && itemsInActualDiff.includes(this.remainingExpected[i])) {
+            actualRemainingPostDiffIndex = this.remainingActual.indexOf(this.remainingExpected[i])
             b = true
         }
-        if (actual.length > 1 && itemsInExpectedDiff.includes(actual[i])) {
-            expectedRemainingPostDiffIndex = expected.indexOf(actual[i])
+        if (this.remainingActual.length > 1 && itemsInExpectedDiff.includes(this.remainingActual[i])) {
+            expectedRemainingPostDiffIndex = this.remainingExpected.indexOf(this.remainingActual[i])
             b = true
         }
         if (b)
             break
     }
-    return { expectedRemainingPostDiffIndex, actualRemainingPostDiffIndex }
+
+    const diffOfExpected = this.remainingExpected.slice(0, expectedRemainingPostDiffIndex)
+    const diffOfActual = this.remainingActual.slice(0, actualRemainingPostDiffIndex)
+
+    const diffPart = generateDiffString.call(this, diffOfExpected, diffOfActual)
+    if(diffPart.length > 0) {
+        this.diffParts.push(diffPart)
+    }
+    this.remainingExpected = this.remainingExpected.slice(expectedRemainingPostDiffIndex)
+    this.remainingActual = this.remainingActual.slice(actualRemainingPostDiffIndex)
 }
 
 function generateDiffString(expected, actual) {
@@ -86,15 +84,20 @@ function encodeString(str) {
         .replace(EXPECTED_ACTUAL_SEPARATOR , ENCODED_EXPECTED_ACTUAL_SEPARATOR)
 }
 
-function findCommonPrefix(expected, actual) {
-    let minLenght = Math.min(expected.length, actual.length)
+function addNextPrefix() {
+    let minLenght = Math.min(this.remainingExpected.length, this.remainingActual.length)
     let i = 0
     for (; i < minLenght; i++) {
-        if (expected[i] !== actual[i]) {
-            return expected.slice(0, i)
+        if (this.remainingExpected[i] !== this.remainingActual[i]) {
+            break
         }
     }
-    return actual.slice(0, i)
+
+    if(i > 0) {
+        this.diffParts.push(this.remainingActual.slice(0,i).join(this.delimiter))
+    }
+    this.remainingExpected = this.remainingExpected.slice(i)
+    this.remainingActual = this.remainingActual.slice(i)
 }
 
 module.exports = Diff
