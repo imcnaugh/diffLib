@@ -17,18 +17,6 @@ Diff.prototype.getDiffString = function() {
     return createDiffString(this.expected.split(this.delimiter), this.actual.split(this.delimiter), this.delimiter)
 }
 
-Diff.prototype.diffByLetter = function() {
-    const sepereator = ''
-    if(this.isEqual) return this.actual
-    return createDiffString(this.expected.split(sepereator), this.actual.split(sepereator), sepereator)
-}
-
-Diff.prototype.diffByWord = function() {
-    const sepereator = ' '
-    if(this.isEqual) return this.actual
-    return createDiffString(this.expected.split(sepereator), this.actual.split(sepereator), sepereator)
-}
-
 Diff.prototype.diffByLine = function() {
     const sepereator = '\n'
     if(this.isEqual) return this.actual
