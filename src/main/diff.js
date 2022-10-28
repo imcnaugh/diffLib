@@ -16,18 +16,18 @@ Diff.prototype.getDiffString = function() {
     this.diffParts = []
     this.remainingExpected = this.expected.split(this.delimiter)
     this.remainingActual = this.actual.split(this.delimiter)
-    return createDiffString.call(this)
+    return this.createDiffString()
 }
 
-function createDiffString() {
+Diff.prototype.createDiffString = function() {
     if(this.remainingExpected.length === 0 && this.remainingActual.length === 0) return ''
-    addNextPrefix.call(this)
-    addNextDiff.call(this)
-    createDiffString.call(this)
+    this.addNextPrefix()
+    this.addNextDiff()
+    this.createDiffString()
     return this.diffParts.join(this.delimiter)
 }
 
-function addNextDiff() {
+Diff.prototype.addNextDiff = function() {
     let expectedRemainingPostDiffIndex = 0
     let actualRemainingPostDiffIndex = 0
     let itemsInExpectedDiff = []
@@ -58,7 +58,7 @@ function addNextDiff() {
     const diffOfExpected = this.remainingExpected.slice(0, expectedRemainingPostDiffIndex)
     const diffOfActual = this.remainingActual.slice(0, actualRemainingPostDiffIndex)
 
-    const diffPart = generateDiffString.call(this, diffOfExpected, diffOfActual)
+    const diffPart = this.generateDiffString(diffOfExpected, diffOfActual)
     if(diffPart.length > 3) {
         this.diffParts.push(diffPart)
     }
@@ -66,7 +66,7 @@ function addNextDiff() {
     this.remainingActual = this.remainingActual.slice(actualRemainingPostDiffIndex)
 }
 
-function generateDiffString(expected, actual) {
+Diff.prototype.generateDiffString = function(expected, actual) {
     return START_DIFF_TAG +
         expected.join(this.delimiter) +
         EXPECTED_ACTUAL_SEPARATOR +
@@ -81,7 +81,7 @@ function encodeString(str) {
         .replace(EXPECTED_ACTUAL_SEPARATOR , ENCODED_EXPECTED_ACTUAL_SEPARATOR)
 }
 
-function addNextPrefix() {
+Diff.prototype.addNextPrefix = function() {
     let minLenght = Math.min(this.remainingExpected.length, this.remainingActual.length)
     let i = 0
     for (; i < minLenght; i++) {
