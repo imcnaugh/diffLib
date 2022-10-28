@@ -32,8 +32,9 @@ Diff.prototype.generateDiffParts = function() {
 Diff.prototype.addNextPrefix = function() {
     const indexOfNextDiff = this.findIndexOfNextDiff()
     const commonPrefix = this.remainingActual.slice(0, indexOfNextDiff).join(this.delimiter)
-    this.sliceRemaining(indexOfNextDiff, indexOfNextDiff)
+
     this.diffParts.push(commonPrefix)
+    this.sliceRemaining(indexOfNextDiff, indexOfNextDiff)
 }
 
 Diff.prototype.findIndexOfNextDiff = function() {
