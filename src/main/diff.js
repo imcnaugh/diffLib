@@ -24,8 +24,8 @@ function createDiffString(expected, actual) {
         return actual.join(this.delimiter)
     }
 
-    actual = actual.slice(commonPrefix.length)
     expected = expected.slice(commonPrefix.length)
+    actual = actual.slice(commonPrefix.length)
 
     let { expectedRemainingPostDiffIndex, actualRemainingPostDiffIndex } = findIndexsForNextCommonElement.call(this, expected, actual)
     const diffOfExpected = expected.slice(0, expectedRemainingPostDiffIndex)
