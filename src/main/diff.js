@@ -40,14 +40,16 @@ function createDiffString(expected, actual, sepereator) {
     expected = expected.slice(commonPrefix.length)
 
     let { expectedRemainingPostDiffIndex, actualRemainingPostDiffIndex } = findIndexsForNextCommonElement(expected, actual)
-    let diff = generateDiffString(expected.slice(0, expectedRemainingPostDiffIndex), actual.slice(0, actualRemainingPostDiffIndex), sepereator)
+    const diffOfExpected = expected.slice(0, expectedRemainingPostDiffIndex)
+    const diffOfActual = actual.slice(0, actualRemainingPostDiffIndex)
+    let diff = generateDiffString(diffOfExpected, diffOfActual, sepereator)
 
-    let remainingExpected = expected.slice(expectedRemainingPostDiffIndex)
-    let remainingActual = actual.slice(actualRemainingPostDiffIndex)
+    expected = expected.slice(expectedRemainingPostDiffIndex)
+    actual = actual.slice(actualRemainingPostDiffIndex)
 
     commonPrefix.push(diff)
-    if(remainingActual.length > 0 && remainingExpected.length > 0) {
-        let postFix = createDiffString(remainingExpected, remainingActual, sepereator)
+    if(actual.length > 0 && expected.length > 0) {
+        let postFix = createDiffString(expected, actual, sepereator)
         commonPrefix.push(postFix)
     }
     return commonPrefix.join(sepereator)
