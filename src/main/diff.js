@@ -30,12 +30,11 @@ function createDiffString(expected, actual) {
     let { expectedRemainingPostDiffIndex, actualRemainingPostDiffIndex } = findIndexsForNextCommonElement.call(this, expected, actual)
     const diffOfExpected = expected.slice(0, expectedRemainingPostDiffIndex)
     const diffOfActual = actual.slice(0, actualRemainingPostDiffIndex)
-    let diff = generateDiffString.call(this, diffOfExpected, diffOfActual)
+    commonPrefix.push(generateDiffString.call(this, diffOfExpected, diffOfActual))
 
     expected = expected.slice(expectedRemainingPostDiffIndex)
     actual = actual.slice(actualRemainingPostDiffIndex)
 
-    commonPrefix.push(diff)
     if(actual.length > 0 && expected.length > 0) {
         let postFix = createDiffString.call(this, expected, actual)
         commonPrefix.push(postFix)
