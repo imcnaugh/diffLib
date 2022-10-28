@@ -45,29 +45,34 @@ Diff.prototype.addNextPrefix = function() {
 Diff.prototype.addNextDiff = function() {
     let expectedRemainingPostDiffIndex = 0
     let actualRemainingPostDiffIndex = 0
-    let itemsInExpectedDiff = []
-    let itemsInActualDiff = []
+    let itemsInExpectedDiff = {}
+    let itemsInActualDiff = {}
     let maxOfStringLength = Math.max(this.remainingExpected.length, this.remainingActual.length)
+
     for (let i = 0; i <= maxOfStringLength; i++) {
         expectedRemainingPostDiffIndex = i
         actualRemainingPostDiffIndex = i
+
+        if (this.remainingExpected.length > i && !itemsInExpectedDiff[this.remainingExpected[i]]) {
+            itemsInExpectedDiff[this.remainingExpected[i]] = i
+        }
+        if (this.remainingActual.length > i && !itemsInActualDiff[this.remainingActual[i]]) {
+            itemsInActualDiff[this.remainingActual[i]] = i
+        }
+
         let b = false
-        if (this.remainingExpected.length > i) {
-            itemsInExpectedDiff.push(this.remainingExpected[i])
-        }
-        if (this.remainingActual.length > i) {
-            itemsInActualDiff.push(this.remainingActual[i])
-        }
-        if (this.remainingExpected.length > 1 && itemsInActualDiff.includes(this.remainingExpected[i])) {
+        if (itemsInActualDiff[this.remainingExpected[i]] !== undefined) {
             actualRemainingPostDiffIndex = this.remainingActual.indexOf(this.remainingExpected[i])
             b = true
         }
-        if (this.remainingActual.length > 1 && itemsInExpectedDiff.includes(this.remainingActual[i])) {
+        if (itemsInExpectedDiff[this.remainingActual[i]] !== undefined) {
             expectedRemainingPostDiffIndex = this.remainingExpected.indexOf(this.remainingActual[i])
             b = true
         }
-        if (b)
+        
+        if (b){
             break
+        }
     }
 
     const diffOfExpected = this.remainingExpected.slice(0, expectedRemainingPostDiffIndex)
