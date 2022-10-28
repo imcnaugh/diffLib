@@ -6,9 +6,9 @@ const ENCODED_END_DIFF_TAG = END_DIFF_TAG + END_DIFF_TAG
 const ENCODED_EXPECTED_ACTUAL_SEPARATOR = EXPECTED_ACTUAL_SEPARATOR + EXPECTED_ACTUAL_SEPARATOR
 
 function Diff(expected, actual, delimiter) {
-    this.expected = encodeString(expected)
-    this.actual = encodeString(actual)
-    this.isEqual = this.expected === this.actual
+    this.isEqual = expected === actual
+    this.expected = this.encodeString(expected)
+    this.actual = this.encodeString(actual)
     this.delimiter = delimiter
 }
 
@@ -25,6 +25,22 @@ Diff.prototype.createDiffString = function() {
     this.addNextDiff()
     this.createDiffString()
     return this.diffParts.join(this.delimiter)
+}
+
+Diff.prototype.addNextPrefix = function() {
+    let minLenght = Math.min(this.remainingExpected.length, this.remainingActual.length)
+    let i = 0
+    for (; i < minLenght; i++) {
+        if (this.remainingExpected[i] !== this.remainingActual[i]) {
+            break
+        }
+    }
+
+    if(i > 0) {
+        this.diffParts.push(this.remainingActual.slice(0,i).join(this.delimiter))
+    }
+    this.remainingExpected = this.remainingExpected.slice(i)
+    this.remainingActual = this.remainingActual.slice(i)
 }
 
 Diff.prototype.addNextDiff = function() {
@@ -74,27 +90,11 @@ Diff.prototype.generateDiffString = function(expected, actual) {
         END_DIFF_TAG
 }
 
-function encodeString(str) {
+Diff.prototype.encodeString = function(str) {
     return str.toString()
         .replace(START_DIFF_TAG , ENCODED_START_DIFF_TAG)
         .replace(END_DIFF_TAG , ENCODED_END_DIFF_TAG)
         .replace(EXPECTED_ACTUAL_SEPARATOR , ENCODED_EXPECTED_ACTUAL_SEPARATOR)
-}
-
-Diff.prototype.addNextPrefix = function() {
-    let minLenght = Math.min(this.remainingExpected.length, this.remainingActual.length)
-    let i = 0
-    for (; i < minLenght; i++) {
-        if (this.remainingExpected[i] !== this.remainingActual[i]) {
-            break
-        }
-    }
-
-    if(i > 0) {
-        this.diffParts.push(this.remainingActual.slice(0,i).join(this.delimiter))
-    }
-    this.remainingExpected = this.remainingExpected.slice(i)
-    this.remainingActual = this.remainingActual.slice(i)
 }
 
 module.exports = Diff
