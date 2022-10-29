@@ -6,16 +6,16 @@ const ENCODED_END_DIFF_TAG = END_DIFF_TAG + END_DIFF_TAG;
 const ENCODED_EXPECTED_ACTUAL_SEPARATOR =
   EXPECTED_ACTUAL_SEPARATOR + EXPECTED_ACTUAL_SEPARATOR;
 
-function Diff(expected, actual, delimiter) {
-  this.expected = expected;
-  this.actual = actual;
+function Diff(input1, input2, delimiter) {
+  this.expected = input1;
+  this.actual = input2;
   this.delimiter = delimiter;
-  this.isEqual = expected === actual;
+  this.isEqual = input1 === input2;
 
-  this.encodedExpected = this.encodeString(expected);
-  this.encodedActual = this.encodeString(actual);
-  this.input1 = this.encodedExpected.split(this.delimiter);
-  this.input2 = this.encodedActual.split(this.delimiter);
+  this.encodedInput1 = this.encodeString(input1);
+  this.encodedInput2 = this.encodeString(input2);
+  this.input1 = this.encodedInput1.split(this.delimiter);
+  this.input2 = this.encodedInput2.split(this.delimiter);
 }
 
 Diff.prototype.getDiffString = function () {
