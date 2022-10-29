@@ -7,15 +7,16 @@ const ENCODED_EXPECTED_ACTUAL_SEPARATOR =
   EXPECTED_ACTUAL_SEPARATOR + EXPECTED_ACTUAL_SEPARATOR;
 
 function Diff(input1, input2, delimiter) {
-  this.expected = input1;
-  this.actual = input2;
+  this.input1 = input1;
+  this.input2 = input2;
   this.delimiter = delimiter;
   this.isEqual = input1 === input2;
-
   this.encodedInput1 = this.encodeString(input1);
   this.encodedInput2 = this.encodeString(input2);
-  this.input1 = this.encodedInput1.split(this.delimiter);
-  this.input2 = this.encodedInput2.split(this.delimiter);
+  this.input1Parts = this.encodedInput1.split(this.delimiter);
+  this.input2Parts = this.encodedInput2.split(this.delimiter);
+  this.totalParts = this.input1Parts.length + this.input2Parts.length;
+  this.countOfDiffs = 0;
 }
 
 Diff.prototype.getDiffString = function () {
@@ -28,31 +29,31 @@ Diff.prototype.populateDiffParts = function () {
   do {
     this.proccessCommonPrefix();
     this.proccessNextDiff(); 
-  } while(this.input1.length > 0 && this.input2.length > 0)
+  } while(this.input1Parts.length > 0 && this.input2Parts.length > 0)
 };
 
 Diff.prototype.proccessCommonPrefix = function () {
   const indexOfNextDiff = this.findIndexOfNextDiff();
-  const commonPrefix = this.input1.slice(0, indexOfNextDiff);
+  const commonPrefix = this.input1Parts.slice(0, indexOfNextDiff);
   this.diffParts = this.diffParts.concat(commonPrefix);
   this.sliceInputs(indexOfNextDiff, indexOfNextDiff);
 };
 
 Diff.prototype.proccessNextDiff = function () {
   let { expectedNextCommonIndex, actualNextCommonIndex } = this.findIndexOfNextCommon();
-
-  const diffOfExpected = this.input1.slice(0, expectedNextCommonIndex);
-  const diffOfActual = this.input2.slice(0, actualNextCommonIndex);
+  this.countOfDiffs = this.countOfDiffs + expectedNextCommonIndex + actualNextCommonIndex;
+  const diffOfExpected = this.input1Parts.slice(0, expectedNextCommonIndex);
+  const diffOfActual = this.input2Parts.slice(0, actualNextCommonIndex);
   const diffPart = this.generateDiffString(diffOfExpected, diffOfActual);
   this.diffParts = this.diffParts.concat(diffPart);
   this.sliceInputs(expectedNextCommonIndex, actualNextCommonIndex);
 };
 
 Diff.prototype.findIndexOfNextDiff = function () {
-  let minLenght = Math.min(this.input1.length, this.input2.length);
+  let minLenght = Math.min(this.input1Parts.length, this.input2Parts.length);
   let i = 0;
   for (; i < minLenght; i++) {
-    if (this.input1[i] !== this.input2[i]) {
+    if (this.input1Parts[i] !== this.input2Parts[i]) {
       break;
     }
   }
@@ -60,53 +61,60 @@ Diff.prototype.findIndexOfNextDiff = function () {
 };
 
 Diff.prototype.findIndexOfNextCommon = function () {
-  let expectedNextCommonIndex = 0;
-  let actualNextCommonIndex = 0;
-  let expectedFirstOccuranceOfItem = {};
-  let actualFirstOccuranceOfItem = {};
-  let maxOfStringLength = Math.max(this.input1.length, this.input2.length);
+  let input1NextCommonIndex = 0;
+  let input2NextCommonIndex = 0;
+  let input1FirstOccuranceOfItem = {};
+  let input2FirstOccuranceOfItem = {};
+  let maxOfStringLength = Math.max(this.input1Parts.length, this.input2Parts.length);
 
-  for (let i = 0; i <= maxOfStringLength;i++, expectedNextCommonIndex++, actualNextCommonIndex++) {
-    const remainingExpectedCharAti = this.input1[i];
-    const remainingActualCharAti = this.input2[i];
+  for (let i = 0; i <= maxOfStringLength;i++) {
+    const input1CharAtIndex = this.input1Parts[i];
+    const input2CharAtIndex = this.input2Parts[i];
+
+    input1NextCommonIndex = i;
+    input2NextCommonIndex = i;
 
     if (
-      this.input1.length > i &&
-      !expectedFirstOccuranceOfItem[remainingExpectedCharAti]
+      this.input1Parts.length > i &&
+      !input1FirstOccuranceOfItem[input1CharAtIndex]
     ) {
-      expectedFirstOccuranceOfItem[remainingExpectedCharAti] = i;
+      input1FirstOccuranceOfItem[input1CharAtIndex] = i;
     }
     if (
-      this.input2.length > i &&
-      !actualFirstOccuranceOfItem[remainingActualCharAti]
+      this.input2Parts.length > i &&
+      !input2FirstOccuranceOfItem[input2CharAtIndex]
     ) {
-      actualFirstOccuranceOfItem[remainingActualCharAti] = i;
+      input2FirstOccuranceOfItem[input2CharAtIndex] = i;
     }
 
-    let b = false;
-    if (actualFirstOccuranceOfItem[remainingExpectedCharAti] !== undefined) {
-      actualNextCommonIndex = this.input2.indexOf(
-        remainingExpectedCharAti
+    let shouldBreak = false;
+    if (input2FirstOccuranceOfItem[input1CharAtIndex] !== undefined) {
+      input2NextCommonIndex = this.input2Parts.indexOf(
+        input1CharAtIndex
       );
-      b = true;
+      shouldBreak = true;
     }
-    if (expectedFirstOccuranceOfItem[remainingActualCharAti] !== undefined) {
-      expectedNextCommonIndex = this.input1.indexOf(
-        remainingActualCharAti
+    if (input1FirstOccuranceOfItem[input2CharAtIndex] !== undefined) {
+      input1NextCommonIndex = this.input1Parts.indexOf(
+        input2CharAtIndex
       );
-      b = true;
+      shouldBreak = true;
     }
-    if (b) break;
+    if (shouldBreak) break;
   }
-  return { expectedNextCommonIndex, actualNextCommonIndex };
+  return { expectedNextCommonIndex: input1NextCommonIndex, actualNextCommonIndex: input2NextCommonIndex };
 };
 
 Diff.prototype.sliceInputs = function (
   remainingSliceIndex,
   actualSliceIndex
 ) {
-  this.input1 = this.input1.slice(remainingSliceIndex);
-  this.input2 = this.input2.slice(actualSliceIndex);
+  this.input1Parts = this.input1Parts.slice(remainingSliceIndex);
+  this.input2Parts = this.input2Parts.slice(actualSliceIndex);
+};
+
+Diff.prototype.getPercentDifferent = function () {
+  return (this.countOfDiffs / this.totalParts) * 100;
 };
 
 Diff.prototype.generateDiffString = function (expected, actual) {
