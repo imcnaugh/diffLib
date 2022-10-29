@@ -3,8 +3,7 @@ const END_DIFF_TAG = "]";
 const EXPECTED_ACTUAL_SEPARATOR = "|";
 const ENCODED_START_DIFF_TAG = START_DIFF_TAG + START_DIFF_TAG;
 const ENCODED_END_DIFF_TAG = END_DIFF_TAG + END_DIFF_TAG;
-const ENCODED_EXPECTED_ACTUAL_SEPARATOR =
-  EXPECTED_ACTUAL_SEPARATOR + EXPECTED_ACTUAL_SEPARATOR;
+const ENCODED_EXPECTED_ACTUAL_SEPARATOR = EXPECTED_ACTUAL_SEPARATOR + EXPECTED_ACTUAL_SEPARATOR;
 
 function Diff(input1, input2, delimiter) {
   this.input1 = input1;
@@ -85,10 +84,7 @@ Diff.prototype.findIndexOfNextCommon = function () {
   return { input1NextCommonIndex, input2NextCommonIndex };
 };
 
-Diff.prototype.sliceInputs = function (
-  remainingSliceIndex,
-  actualSliceIndex
-) {
+Diff.prototype.sliceInputs = function (remainingSliceIndex, actualSliceIndex) {
   this.input1Parts = this.input1Parts.slice(remainingSliceIndex);
   this.input2Parts = this.input2Parts.slice(actualSliceIndex);
 };
