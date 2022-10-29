@@ -17,6 +17,7 @@ function Diff(input1, input2, delimiter) {
   this.input2Parts = this.encodedInput2.split(this.delimiter);
   this.totalParts = this.input1Parts.length + this.input2Parts.length;
   this.countOfDiffs = 0;
+  this.diffString = this.getDiffString();
 }
 
 Diff.prototype.getDiffString = function () {
@@ -40,13 +41,13 @@ Diff.prototype.proccessCommonPrefix = function () {
 };
 
 Diff.prototype.proccessNextDiff = function () {
-  let { expectedNextCommonIndex, actualNextCommonIndex } = this.findIndexOfNextCommon();
-  this.countOfDiffs = this.countOfDiffs + expectedNextCommonIndex + actualNextCommonIndex;
-  const diffOfExpected = this.input1Parts.slice(0, expectedNextCommonIndex);
-  const diffOfActual = this.input2Parts.slice(0, actualNextCommonIndex);
+  let { input1NextCommonIndex, input2NextCommonIndex } = this.findIndexOfNextCommon();
+  this.countOfDiffs = this.countOfDiffs + input1NextCommonIndex + input2NextCommonIndex;
+  const diffOfExpected = this.input1Parts.slice(0, input1NextCommonIndex);
+  const diffOfActual = this.input2Parts.slice(0, input2NextCommonIndex);
   const diffPart = this.generateDiffString(diffOfExpected, diffOfActual);
   this.diffParts = this.diffParts.concat(diffPart);
-  this.sliceInputs(expectedNextCommonIndex, actualNextCommonIndex);
+  this.sliceInputs(input1NextCommonIndex, input2NextCommonIndex);
 };
 
 Diff.prototype.findIndexOfNextDiff = function () {
@@ -71,38 +72,17 @@ Diff.prototype.findIndexOfNextCommon = function () {
     const input1CharAtIndex = this.input1Parts[i];
     const input2CharAtIndex = this.input2Parts[i];
 
-    input1NextCommonIndex = i;
-    input2NextCommonIndex = i;
+    input1FirstOccuranceOfItem[input1CharAtIndex] = input1FirstOccuranceOfItem[input1CharAtIndex] === undefined ? i : input1FirstOccuranceOfItem[input1CharAtIndex];
+    input2FirstOccuranceOfItem[input2CharAtIndex] = input2FirstOccuranceOfItem[input2CharAtIndex] === undefined ? i : input2FirstOccuranceOfItem[input2CharAtIndex];
 
-    if (
-      this.input1Parts.length > i &&
-      !input1FirstOccuranceOfItem[input1CharAtIndex]
-    ) {
-      input1FirstOccuranceOfItem[input1CharAtIndex] = i;
+    if(input1FirstOccuranceOfItem[input2CharAtIndex] !== undefined || input2FirstOccuranceOfItem[input1CharAtIndex] !== undefined) {
+      let commonItem = input1FirstOccuranceOfItem[input2CharAtIndex] !== undefined ? input2CharAtIndex : input1CharAtIndex;
+      input1NextCommonIndex = input1FirstOccuranceOfItem[commonItem];
+      input2NextCommonIndex = input2FirstOccuranceOfItem[commonItem];
+      break
     }
-    if (
-      this.input2Parts.length > i &&
-      !input2FirstOccuranceOfItem[input2CharAtIndex]
-    ) {
-      input2FirstOccuranceOfItem[input2CharAtIndex] = i;
-    }
-
-    let shouldBreak = false;
-    if (input2FirstOccuranceOfItem[input1CharAtIndex] !== undefined) {
-      input2NextCommonIndex = this.input2Parts.indexOf(
-        input1CharAtIndex
-      );
-      shouldBreak = true;
-    }
-    if (input1FirstOccuranceOfItem[input2CharAtIndex] !== undefined) {
-      input1NextCommonIndex = this.input1Parts.indexOf(
-        input2CharAtIndex
-      );
-      shouldBreak = true;
-    }
-    if (shouldBreak) break;
   }
-  return { expectedNextCommonIndex: input1NextCommonIndex, actualNextCommonIndex: input2NextCommonIndex };
+  return { input1NextCommonIndex, input2NextCommonIndex };
 };
 
 Diff.prototype.sliceInputs = function (

@@ -5,13 +5,13 @@ describe('Verify diff by line', () => {
         const s1 = 'aaa\nbbb\nccc'
         const s2 = 'aaa\nccc'
         const diff = new LineDiff(s1, s2)
-        expect(diff.getDiffString()).toBe('aaa\n[bbb|]\nccc')
+        expect(diff.diffString).toBe('aaa\n[bbb|]\nccc')
     })
 
     test('a string of words 1 char off should flag the whole line', () => {
         const s1 = 'words but some are misspelled';
         const s2 = 'word but some are misspelled';
         const diff = new LineDiff(s1, s2)
-        expect(diff.getDiffString()).toBe('[words but some are misspelled|word but some are misspelled]')
+        expect(diff.diffString).toBe('[words but some are misspelled|word but some are misspelled]')
     })
 })

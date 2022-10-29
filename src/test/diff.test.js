@@ -26,21 +26,21 @@ describe('Verify diff paramaters', () => {
 describe('Verify some edge cases are handled', () => {
     test('ints should be diffed propertly', () => {
         const diff = new Diff(1, 2)
-        expect(diff.getDiffString()).toBe('[1|2]')
+        expect(diff.diffString).toBe('[1|2]')
     })
     
     test('two of the same ints should diff properly', () => {
         const diff = new Diff(0, 0)
-        expect(diff.getDiffString()).toBe('0')
+        expect(diff.diffString).toBe('0')
     })
     
     test('what happens when an int and a string are diffed', () => {
         const diff = new Diff(1, '1')
-        expect(diff.getDiffString()).toBe('1')
+        expect(diff.diffString).toBe('1')
     })
     
     test('what happens when large ints and a string are diffed', () => {
         const diff = new Diff(1001, '1001')
-        expect(diff.getDiffString()).toBe('1001')
+        expect(diff.diffString).toBe('1001')
     })
 })
