@@ -62,25 +62,21 @@ describe('Verify diff by letter', () => {
 describe('Verify diff percent', () => {
     test('two equal strings should have a 0% diff', () => {
         const diff = new LetterDiff('1', '1')
-        diff.diffString
         expect(diff.getPercentDifferent()).toBe(0)
     })
 
     test('two unequal strings should have a 100% diff', () => {
         const diff = new LetterDiff('1', '2')
-        diff.diffString
         expect(diff.getPercentDifferent()).toBe(100)
     })
 
     test('two unequal strings should have a 50% diff', () => {
         const diff = new LetterDiff('13', '12')
-        diff.diffString
         expect(diff.getPercentDifferent()).toBe(50)
     })
 
     test('two similar strings should have a small diff percentage', () => {
         const diff = new LetterDiff('aaaaaaaa', 'aaaaaaab')
-        diff.diffString
         expect(diff.getPercentDifferent()).toBe(12.5)
     })
 })
